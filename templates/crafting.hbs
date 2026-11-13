@@ -1,0 +1,162 @@
+<div class="craft-body">
+
+    <header class="craft-header">
+        <div class="craft-stat">
+            <span class="label">{{ localize "DND5ECRAFT.Wealth" }}</span>
+            <span class="value"><i class="fa-solid fa-coins" inert></i> {{ wealth }}</span>
+        </div>
+        <div class="craft-stat tools">
+            <span class="label">{{ localize "DND5ECRAFT.Tools" }}</span>
+            <span class="value">{{#if hasTools}}{{ toolList }}{{else}}{{ localize "DND5ECRAFT.NoTools" }}{{/if}}</span>
+        </div>
+    </header>
+
+    <nav class="craft-tabs tabs" role="tablist">
+        {{#each tabs}}
+        <button type="button" class="craft-tab {{#if active}}active{{/if}}" role="tab" aria-selected="{{ active }}"
+                data-action="switchTab" data-tab="{{ id }}">
+            <i class="{{ icon }}" inert></i> {{ localize label }}
+            {{#if count}}<span class="count">{{ count }}</span>{{/if}}
+        </button>
+        {{/each}}
+    </nav>
+
+    {{!-- Projects --}}
+    {{#if (eq tab "projects")}}
+    <div class="craft-scroll">
+        {{#each projects}}
+        <article class="craft-project {{#if finished}}finished{{/if}}" data-project-id="{{ id }}">
+            <img src="{{ img }}" alt="" {{#if uuid}}data-item-uuid="{{ uuid }}"{{/if}}>
+            <div class="info">
+                <h3 {{#if uuid}}data-item-uuid="{{ uuid }}"{{/if}}>
+                    {{ label }}
+                    {{#if finished}}<span class="badge"><i class="fa-solid fa-check" inert></i> {{ localize "DND5ECRAFT.Finished" }}</span>{{/if}}
+                </h3>
+                <p class="meta">{{ toolLabel }} · {{ localize "DND5ECRAFT.MaterialsPaid" cost=costLabel }}</p>
+                {{#if helperNames}}
+                <p class="meta helpers">
+                    <i class="fa-solid fa-people-carry-box" inert></i>
+                    {{ localize "DND5ECRAFT.Helpers.Line" names=helperNames }} · {{ daysLeft }}
+                </p>
+                {{/if}}
+                <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="{{ days }}"
+                     aria-valuenow="{{ progress }}">
+                    <div class="bar" style="width: {{ pct }}%"></div>
+                    <span class="text">{{ progress }} / {{ days }} {{ localize "DND5ECRAFT.Workdays" }}</span>
+                </div>
+            </div>
+            <div class="buttons">
+                {{#if needsFinish}}
+                <button type="button" data-action="finish" data-tooltip="DND5ECRAFT.FinishHint">
+                    <i class="fa-solid fa-check" inert></i> {{ localize "DND5ECRAFT.Finish" }}
+                </button>
+                {{/if}}
+                {{#unless complete}}
+                <button type="button" data-action="logWork" data-tooltip="DND5ECRAFT.LogWork.Button">
+                    <i class="fa-solid fa-hammer" inert></i> {{ localize "DND5ECRAFT.LogWork.Short" }}
+                </button>
+                {{/unless}}
+                {{#if canHelp}}
+                <button type="button" class="icon" data-action="helpers" data-tooltip="DND5ECRAFT.Helpers.Button"
+                        aria-label="{{ localize "DND5ECRAFT.Helpers.Button" }}">
+                    <i class="fa-solid fa-people-carry-box" inert></i>
+                </button>
+                {{/if}}
+                {{#if finished}}
+                <button type="button" class="icon" data-action="abandon" data-tooltip="DND5ECRAFT.Clear"
+                        aria-label="{{ localize "DND5ECRAFT.Clear" }}">
+                    <i class="fa-solid fa-xmark" inert></i>
+                </button>
+                {{else}}
+                <button type="button" class="icon" data-action="abandon" data-tooltip="DND5ECRAFT.Abandon.Title"
+                        aria-label="{{ localize "DND5ECRAFT.Abandon.Title" }}">
+                    <i class="fa-solid fa-trash" inert></i>
+                </button>
+                {{/if}}
+            </div>
+        </article>
+        {{else}}
+        <p class="craft-empty">{{ localize "DND5ECRAFT.NoProjects" }}</p>
+        {{/each}}
+        {{#if hasFinished}}
+        <button type="button" class="craft-clear" data-action="clearFinished">
+            <i class="fa-solid fa-broom" inert></i> {{ localize "DND5ECRAFT.ClearFinished" }}
+        </button>
+        {{/if}}
+    </div>
+    {{/if}}
+
+    {{!-- New Project --}}
+    {{#if (eq tab "new")}}
+    <div class="craft-drop">
+        <i class="fa-solid fa-hand-holding-box" inert></i> {{ localize "DND5ECRAFT.Drop" }}
+    </div>
+    <div class="craft-filter">
+        <input type="search" name="search" value="{{ search }}" placeholder="{{ localize "DND5ECRAFT.Search" }}"
+               aria-label="{{ localize "DND5ECRAFT.Search" }}">
+        <label class="checkbox">
+            <input type="checkbox" data-action="toggleAll" {{ checked showAll }}>
+            {{ localize "DND5ECRAFT.ShowAll" }}
+        </label>
+    </div>
+    <div class="craft-scroll craft-catalog">
+        {{#each entries}}
+        <div class="craft-entry {{#unless ok}}disabled{{/unless}}" data-uuid="{{ uuid }}" data-search="{{ search }}">
+            <img src="{{ img }}" alt="" data-item-uuid="{{ uuid }}">
+            <div class="info">
+                <span class="name" data-item-uuid="{{ uuid }}">{{ name }}{{#if rarity}} <span class="rarity">{{ rarity }}</span>{{/if}}</span>
+                <span class="meta">{{#if ok}}{{ tools }} · {{ estimate }}{{else}}{{ reason }}{{/if}}</span>
+            </div>
+            {{#if ok}}
+            <button type="button" data-action="start">
+                <i class="fa-solid fa-hammer" inert></i> {{ localize "DND5ECRAFT.Start.Short" }}
+            </button>
+            {{/if}}
+        </div>
+        {{/each}}
+        <p class="craft-empty craft-catalog-empty" {{#if entries.length}}hidden{{/if}}>
+            {{#if hasTools}}{{ localize "DND5ECRAFT.NoMatches" }}{{else}}{{ localize "DND5ECRAFT.NoTools" }}{{/if}}
+        </p>
+    </div>
+    {{/if}}
+
+    {{!-- Fast Crafting --}}
+    {{#if (eq tab "fast")}}
+    <div class="craft-scroll craft-fast">
+        <p class="hint">{{ localize "DND5ECRAFT.Fast.Hint" }}</p>
+        {{#if fast.enabled}}
+        {{#if fast.used}}
+        <p class="craft-empty"><i class="fa-solid fa-moon" inert></i> {{ localize "DND5ECRAFT.Fast.Used" }}</p>
+        {{else}}
+        {{#each fast.options}}
+        <section class="fast-tool">
+            <h3>{{ label }}</h3>
+            <div class="fast-items">
+                {{#each items}}
+                <button type="button" class="fast-item" data-action="fastCraft" data-tool="{{ ../tool }}"
+                        data-key="{{ key }}" data-name="{{ name }}" {{#if uuid}}data-item-uuid="{{ uuid }}"{{/if}}>
+                    <img src="{{ img }}" alt=""> {{ name }}
+                </button>
+                {{/each}}
+            </div>
+        </section>
+        {{else}}
+        <p class="craft-empty">{{ localize "DND5ECRAFT.Fast.NoTools" }}</p>
+        {{/each}}
+        {{/if}}
+        {{else}}
+        <p class="craft-empty">{{ localize "DND5ECRAFT.Fast.NeedFeat" }}</p>
+        {{/if}}
+
+        {{#if fast.held.length}}
+        <section class="fast-held">
+            <h3>{{ localize "DND5ECRAFT.Fast.Held" }}</h3>
+            <ul>
+                {{#each fast.held}}<li data-item-uuid="{{ uuid }}"><img src="{{ img }}" alt=""> {{ name }}</li>{{/each}}
+            </ul>
+        </section>
+        {{/if}}
+    </div>
+    {{/if}}
+
+</div>

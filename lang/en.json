@@ -1,0 +1,121 @@
+{
+  "DND5ECRAFT": {
+    "Button": "Crafting",
+    "Title": "Crafting: {name}",
+    "Wealth": "Coins",
+    "Tools": "Tool proficiencies",
+    "NoTools": "You aren't proficient with any tools that can craft items.",
+    "Free": "free",
+    "Workdays": "workdays",
+    "MaterialsPaid": "{cost} materials paid",
+    "Finished": "Finished",
+    "Finish": "Finish",
+    "FinishHint": "All workdays are logged. Put the item in your inventory.",
+    "FinishFailed": "Couldn't add {item} to the inventory. See the console for details.",
+    "Clear": "Clear from list",
+    "ClearFinished": "Clear Finished Projects",
+    "NoProjects": "No projects yet. Start one on the New Project tab.",
+    "Drop": "Drop an item here from a compendium or the Items sidebar to craft it.",
+    "Search": "Search items",
+    "ShowAll": "Show items I can't craft",
+    "NoMatches": "No craftable items match.",
+    "Estimate": "{cost} · {days} days",
+    "CantAfford": "{name} can't afford the materials ({cost}). They have {wealth}.",
+    "Tab": {
+      "Projects": "Projects",
+      "New": "New Project",
+      "Fast": "Fast Crafting"
+    },
+    "Reason": {
+      "Unlisted": "The crafting rules don't list a tool for this item.",
+      "NoTool": "Needs proficiency with {tools}.",
+      "Arcana": "Magic items need proficiency in Arcana.",
+      "MagicOff": "Crafting magic items is turned off."
+    },
+    "Start": {
+      "Title": "Craft {item}",
+      "Short": "Craft",
+      "Button": "Buy Materials and Start",
+      "Tool": "Tool",
+      "Quantity": "How many",
+      "Batches": "Batches",
+      "BatchHint": "Each batch makes {count}.",
+      "Summary": "Materials {cost}, {days} workdays. You have {wealth}."
+    },
+    "LogWork": {
+      "Title": "Work on {item}",
+      "Button": "Log Workdays",
+      "Short": "Work",
+      "Days": "Workdays",
+      "Hint": "A workday is 8 hours. {remaining} workdays left.",
+      "HintHelped": "A workday is 8 hours. With {helpers} helping, each day counts as {crew} workdays. {remaining} workdays left, about {days} days."
+    },
+    "Helpers": {
+      "Button": "Helpers",
+      "Title": "Helpers: {item}",
+      "Hint": "Helpers must be proficient with {tool}. Each one divides the crafting time. Up to {max} can help.",
+      "Save": "Save Helpers",
+      "None": "No other characters are proficient with {tool}.",
+      "TooMany": "Only {max} can help on a project.",
+      "Line": "Helped by {names}",
+      "DaysLeft": "about {days} days left"
+    },
+    "Abandon": {
+      "Title": "Abandon Project",
+      "Content": "Abandon {item}? The {cost} spent on materials is lost."
+    },
+    "Fast": {
+      "Title": "Fast Crafting",
+      "Hint": "When you finish a long rest, you can craft one piece of gear from this table for free. It falls apart when you finish your next long rest.",
+      "Confirm": "Craft {item} with {tool}? You can't use Fast Crafting again until you finish a long rest, and the item lasts until then.",
+      "Used": "You've used Fast Crafting. It's ready again after your next long rest.",
+      "NeedFeat": "Fast Crafting needs the Crafter feat.",
+      "NoTools": "You aren't proficient with any Artisan's Tools on the Fast Crafting table.",
+      "Held": "Lasts until your next long rest"
+    },
+    "Chat": {
+      "Started": "{actor} starts crafting <strong>{item}</strong> with {tool}: {days} workdays, {cost} in materials.",
+      "Paid": "Paid {spent}.",
+      "PaidChange": "Paid {spent} and got {change} in change.",
+      "Progress": "{actor} works {days} days on <strong>{item}</strong> ({progress}/{total}).",
+      "ProgressHelped": "{actor} and {helpers} work {days} days on <strong>{item}</strong> ({progress}/{total} workdays).",
+      "Finished": "{actor} finishes crafting <strong>{item}</strong> after {days} workdays.",
+      "Abandoned": "{actor} abandons crafting <strong>{item}</strong>.",
+      "FastCrafted": "{actor} quickly crafts <strong>{item}</strong> with {tool}. It lasts until their next long rest."
+    },
+    "Setting": {
+      "allowMagicItems": {
+        "Name": "Allow Magic Items",
+        "Hint": "Lets characters craft magic items with the 2024 Dungeon Master's Guide rules. Potion of Healing and Spell Scrolls can always be crafted, since the Player's Handbook lists them under a tool."
+      },
+      "requireArcana": {
+        "Name": "Magic Items Need Arcana",
+        "Hint": "Crafting a magic item needs proficiency in Arcana as well as the tool, as in the 2024 Dungeon Master's Guide. Items a tool lists by name, like Potion of Healing and Spell Scroll, don't."
+      },
+      "maxHelpers": {
+        "Name": "Helpers per Project",
+        "Hint": "How many other characters can help on one project. Each helper must be proficient with the project's tool and divides the crafting time. The rules allow one; set 0 to turn helpers off."
+      },
+      "allowUnlisted": {
+        "Name": "Allow Unlisted Items",
+        "Hint": "Items the 2024 tool rules don't name can be crafted with any Artisan's Tools. When off, those items can't be crafted unless they set the module's tools flag."
+      },
+      "fastCrafting": {
+        "Name": "Fast Crafting",
+        "Hint": "Adds the Fast Crafting tab: once per long rest, craft one piece of gear from the Fast Crafting table for free. It falls apart after the next long rest."
+      },
+      "fastCraftingRequiresFeat": {
+        "Name": "Fast Crafting Needs Crafter Feat",
+        "Hint": "Only characters with the Crafter feat can use Fast Crafting."
+      },
+      "postToChat": {
+        "Name": "Post to Chat",
+        "Hint": "Posts a chat message when a project starts, makes progress, finishes or is abandoned."
+      },
+      "itemCompendiums": {
+        "Name": "Item Compendiums",
+        "Hint": "Compendium ids to list craftable items from, separated by commas. Leave blank to use the Player's Handbook and Dungeon Master's Guide equipment, or the dnd5e system's equipment if the Player's Handbook isn't installed."
+      }
+    }
+  }
+}
