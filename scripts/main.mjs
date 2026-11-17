@@ -69,7 +69,6 @@ Hooks.on("renderCharacterActorSheet", (app, element) => {
   const button = document.createElement("button");
   button.type = "button";
   button.className = `${MODULE_ID}-button item-action unbutton always-interactive`;
-  button.dataset.tooltip = "DND5ECRAFT.Button";
   button.setAttribute("aria-label", game.i18n.localize("DND5ECRAFT.Button"));
   button.innerHTML = '<i class="fa-solid fa-hammer" inert></i>';
   button.addEventListener("click", event => {
