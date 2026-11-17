@@ -77,10 +77,22 @@ Hooks.on("renderCharacterActorSheet", (app, element) => {
     CraftingApp.open(actor);
   });
 
-  const coins = currency.querySelector('[data-action="currency"]');
-  if ( coins ) coins.after(button);
-  else currency.prepend(button);
+  currency.prepend(button);
+  sortCurrencyButtons(currency);
 });
+
+/**
+ * Put every button in the coin row (dnd5e's own and any module's) in
+ * alphabetical order by name, ahead of the coin values. Each module that adds a
+ * button does the same, so the result doesn't depend on which one ran last.
+ */
+function sortCurrencyButtons(section) {
+  const name = b => b.getAttribute("aria-label") ?? b.textContent.trim();
+  const buttons = [...section.querySelectorAll(":scope > button")]
+    .sort((a, b) => name(a).localeCompare(name(b), game.i18n.lang));
+  const anchor = section.querySelector(":scope > :not(button)");
+  for (const button of buttons) section.insertBefore(button, anchor);
+}
 
 /* -------------------------------------------- */
 /*  Long rest                                   */

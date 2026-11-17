@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 (2026-11-17)
+### Changed
+- The buttons beside the coins on the inventory tab are now in alphabetical order by name (Crafting, Manage Currency, and any other modules' buttons), whichever module adds its button last.
+
 ## 1.0.1 (2026-11-17)
 ### Changed
 - The hammer button on the inventory tab no longer shows a tooltip.
