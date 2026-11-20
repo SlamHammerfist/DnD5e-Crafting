@@ -91,7 +91,7 @@ export async function loadCatalog() {
   if ( catalogCache ) return catalogCache;
   const fields = [
     "system.identifier", "system.type", "system.rarity", "system.properties", "system.price", "system.quantity",
-    `flags.${MODULE_ID}.tools`
+    `flags.${MODULE_ID}.tools`, "flags.dnd5e.spellLevel"
   ];
   const byKey = new Map();
   for ( const pack of catalogPacks() ) {
@@ -122,7 +122,7 @@ export async function loadCatalog() {
         quantity,
         rarity: d.magic ? d.rarity : "",
         magic: d.magic && !!d.rarity,
-        estimate: estimateCost(entry, d),
+        estimate: await estimateCost(entry),
         source: entry
       });
     }
@@ -131,25 +131,43 @@ export async function loadCatalog() {
   return catalogCache;
 }
 
-/** Rough cost and time from index data, before the full item is loaded. */
-function estimateCost(entry, d) {
-  const { crafting } = CONFIG.DND5E;
-  const price = entry.system.price;
-  const priceCp = (price.value || 0) * coinValue(price.denomination || "gp");
-  if ( !(d.magic && d.rarity) ) {
-    return {
-      cp: Math.ceil(priceCp * crafting.mundane.gold),
-      days: Math.max(1, Math.ceil((priceCp / coinValue("gp")) * crafting.mundane.days))
-    };
+/**
+ * Rough cost and time from index data, before the full item is loaded. For magic items it builds a temporary item
+ * from the index and asks the system for its crafting cost, leaving out the base item (which isn't loaded yet).
+ */
+async function estimateCost(entry) {
+  if ( isMundane(entry.system) ) return mundaneCost(entry.system.price);
+  try {
+    const temp = new Item.implementation({
+      name: entry.name, type: entry.type, system: entry.system, flags: entry.flags ?? {}
+    });
+    const { days, gold } = await temp.system.getCraftCost({ baseItem: "none" });
+    return { cp: gpToCp(gold), days: Math.max(1, days) };
+  } catch(err) {
+    return { cp: 0, days: 1 };
   }
-  const exception = crafting.exceptions[d.key];
-  if ( exception ) return { cp: gpToCp(exception.gold), days: exception.days };
-  const magic = crafting.magic[d.rarity];
-  if ( !magic ) return { cp: 0, days: 1 };
-  const half = entry.type === "consumable";
+}
+
+/** Whether the system prices this item as nonmagical (cost and time follow its price). */
+function isMundane(system) {
+  const properties = system.properties;
+  const magic = (properties instanceof Set) ? properties.has("mgc") : Array.from(properties ?? []).includes("mgc");
+  return !magic || !system.rarity;
+}
+
+/**
+ * Nonmagical cost, using the system's `CONFIG.DND5E.crafting.mundane` rates. Worked out in copper here because
+ * the system's `getCraftCost` rounds the material cost down to whole gold (a 1 gp item would be free).
+ * @param {{ value: number, denomination: string }} price
+ * @param {number} [batches=1]
+ * @returns {{ cp: number, days: number }}
+ */
+function mundaneCost(price, batches=1) {
+  const { mundane } = CONFIG.DND5E.crafting;
+  const priceCp = (price?.value || 0) * coinValue(price?.denomination || "gp") * batches;
   return {
-    cp: gpToCp(half ? Math.floor(magic.gold * crafting.consumable.gold) : magic.gold),
-    days: Math.max(1, half ? Math.floor(magic.days * crafting.consumable.days) : magic.days)
+    cp: Math.ceil(priceCp * mundane.gold),
+    days: Math.max(1, Math.ceil((priceCp / coinValue("gp")) * mundane.days))
   };
 }
 
@@ -165,18 +183,12 @@ function estimateCost(entry, d) {
  * @returns {Promise<{ cp: number, days: number }>}
  */
 export async function craftCost(item, batches=1) {
-  const { crafting } = CONFIG.DND5E;
-  const system = item.system;
-  const isMagic = system.properties?.has?.("mgc") && !!system.rarity;
-  if ( !isMagic ) {
-    const price = system.price ?? {};
-    const priceCp = (price.value || 0) * coinValue(price.denomination || "gp") * batches;
-    return {
-      cp: Math.ceil(priceCp * crafting.mundane.gold),
-      days: Math.max(1, Math.ceil((priceCp / coinValue("gp")) * crafting.mundane.days))
-    };
-  }
-  const { days, gold } = await system.getCraftCost?.() ?? { days: 0, gold: 0 };
+  // Nonmagical batches are priced together, so workdays follow the total price.
+  if ( isMundane(item.system) ) return mundaneCost(item.system.price, batches);
+
+  // Magic items come from the system rules (rarity, base item, consumables, scrolls, exceptions), one at a time.
+  if ( !item.system.getCraftCost ) return { cp: 0, days: 1 };
+  const { days, gold } = await item.system.getCraftCost();
   return { cp: gpToCp(gold) * batches, days: Math.max(1, days * batches) };
 }
 

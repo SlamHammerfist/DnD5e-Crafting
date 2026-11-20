@@ -12,7 +12,9 @@ Click the **hammer** button next to the coins on a character's inventory tab to 
 3. **Buy Materials and Start** pays for the materials and adds the project to the **Projects** tab.
 4. Click **Work** to log workdays. When the days add up, the item goes into your inventory. The project stays on the list marked **Finished** until you clear it with its × button or **Clear Finished Projects**.
 
-Costs and times come from the dnd5e system's crafting rules (`CONFIG.DND5E.crafting`):
+Costs and times come from the dnd5e system's crafting rules (`CONFIG.DND5E.crafting`).
+Magic items use the system's own `getCraftCost()`. Nonmagical items use the same rates worked out to the copper,
+since the system rounds their cost down to whole gold:
 
 | Item | Materials | Time |
 | --- | --- | --- |
@@ -34,8 +36,9 @@ Abandoning a project loses the materials.
 
 ### Paying with your coins
 
-Materials are paid from whatever coins the character has, smallest coins first.
-If a larger coin has to be broken, the change comes back in gold, silver and copper (never electrum).
+Materials are paid from whatever coins the character has, using the dnd5e system's currency manager:
+coins of the cost's own denomination first, then smaller coins, then larger ones.
+If a larger coin has to be broken, the change comes back in gold, silver and copper.
 The chat message lists the coins paid and the change.
 
 ### Which tools craft what

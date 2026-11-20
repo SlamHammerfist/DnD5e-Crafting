@@ -27,49 +27,51 @@ export function walletValue(actor) {
 }
 
 /**
- * Work out the coins an actor pays for a cost. Spends the smallest coins first, then breaks a larger coin
- * if needed and takes the change back in gold, silver and copper.
+ * The largest of gold, silver and copper that a copper amount divides into evenly, so the system's
+ * currency manager can work with whole coins.
+ * @param {number} cp
+ * @returns {string}
+ */
+function paymentDenomination(cp) {
+  return ["gp", "sp", "cp"].find(d => coinValue(d) && !(cp % coinValue(d))) ?? "cp";
+}
+
+/**
+ * Work out the coins an actor pays for a cost, using the dnd5e currency manager. It spends coins of the cost's
+ * denomination first, then smaller coins, then larger ones, breaking a larger coin for change if needed.
  * @param {Actor5e} actor
  * @param {number} cost  Cost in copper.
  * @returns {{ currency: object, spent: object, change: object }|null}  Null if the actor can't afford it.
  */
 export function planPayment(actor, cost) {
-  if ( cost <= 0 ) return { currency: { ...actor.system.currency }, spent: {}, change: {} };
+  const before = { ...actor.system.currency };
+  if ( cost <= 0 ) return { currency: before, spent: {}, change: {} };
   if ( walletValue(actor) < cost ) return null;
 
-  const currency = { ...actor.system.currency };
+  const denomination = paymentDenomination(cost);
+  const amount = cost / coinValue(denomination);
+  const { system, remainder } = dnd5e.applications.CurrencyManager.getActorCurrencyUpdates(
+    actor, amount, denomination, { makeChange: true }
+  );
+  if ( remainder > 0.0001 ) return null;
+
+  // The system gives all change in the cost's denomination (e.g. 999 cp back from 1 pp). Take that change back
+  // out and hand it over again in gold, silver and copper, largest first.
+  const currency = { ...system.currency };
   const spent = {};
-  let remaining = cost;
+  let owed = 0;
   for ( const d of denominations() ) {
-    if ( remaining <= 0 ) break;
-    const value = coinValue(d);
-    const have = Number(currency[d]) || 0;
-    const use = Math.min(have, Math.ceil(remaining / value));
-    if ( !use ) continue;
-    currency[d] = have - use;
-    spent[d] = use;
-    remaining -= use * value;
+    const delta = (Number(currency[d]) || 0) - (Number(before[d]) || 0);
+    if ( delta < 0 ) spent[d] = -delta;
+    else if ( delta > 0 ) {
+      owed += delta * coinValue(d);
+      currency[d] -= delta;
+    }
   }
-
-  // If a larger coin covered more than needed, keep back the smaller coins it made unnecessary.
-  let owed = -remaining;
-  for ( const d of denominations() ) {
-    if ( owed <= 0 ) break;
-    const value = coinValue(d);
-    const keep = Math.min(spent[d] ?? 0, Math.floor(owed / value));
-    if ( !keep ) continue;
-    currency[d] += keep;
-    spent[d] -= keep;
-    if ( !spent[d] ) delete spent[d];
-    owed -= keep * value;
-  }
-
-  // Give change for any overpayment, largest coins first. Electrum is never given as change.
   const change = {};
-  for ( const d of denominations().reverse() ) {
-    if ( (owed <= 0) || (d === "ep") ) continue;
+  for ( const d of ["gp", "sp", "cp"] ) {
     const value = coinValue(d);
-    const count = Math.floor(owed / value);
+    const count = value ? Math.floor(owed / value) : 0;
     if ( !count ) continue;
     currency[d] = (Number(currency[d]) || 0) + count;
     change[d] = count;

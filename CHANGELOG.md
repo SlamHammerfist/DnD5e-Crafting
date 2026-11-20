@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3 (2026-11-19)
+### Changed
+- Coins are now paid through the dnd5e system's currency manager. It spends coins of the cost's denomination first, then smaller coins, then larger ones. Change still comes back in gold, silver and copper.
+- The cost estimates in the item list now use the system's crafting cost for magic items, so spell scrolls show their cost by spell level.
+
 ## 1.0.2 (2026-11-17)
 ### Changed
 - The buttons beside the coins on the inventory tab are now in alphabetical order by name (Crafting, Manage Currency, and any other modules' buttons), whichever module adds its button last.
