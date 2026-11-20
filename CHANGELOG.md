@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.4 (2026-11-19)
+### Fixed
+- Magic items could be crafted with **Allow Magic Items** turned off. dnd5e 6 stores rarity in `system.rarities`, so items such as Hammer of Thunderbolts and Dragon Scale Mail looked nonmagical and were priced at half their listed price. An item now counts as magic if it has the Magical property or any rarity.
+- Magic items with no rarity (like Belt of Giant Strength) can't be crafted, since their cost comes from rarity. Before, they cost nothing.
+
 ## 1.0.3 (2026-11-19)
 ### Changed
 - Coins are now paid through the dnd5e system's currency manager. It spends coins of the cost's denomination first, then smaller coins, then larger ones. Change still comes back in gold, silver and copper.

@@ -30,7 +30,8 @@
       "Unlisted": "The crafting rules don't list a tool for this item.",
       "NoTool": "Needs proficiency with {tools}.",
       "Arcana": "Magic items need proficiency in Arcana.",
-      "MagicOff": "Crafting magic items is turned off."
+      "MagicOff": "Crafting magic items is turned off.",
+      "NoRarity": "This magic item has no rarity, so its crafting cost can't be worked out."
     },
     "Start": {
       "Title": "Craft {item}",

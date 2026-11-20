@@ -110,6 +110,9 @@ export function describe(item) {
   const system = item.system ?? {};
   const properties = system.properties;
   const hasProp = p => (properties instanceof Set) ? properties.has(p) : Array.isArray(properties) && properties.includes(p);
+  // dnd5e 6 keeps rarity in `system.rarities`. Full items have a `rarity` getter for its first entry, but compendium
+  // index entries only have the raw `rarities` array (or `rarity` in data that hasn't been migrated).
+  const rarity = system.rarity || (Array.from(system.rarities ?? [])[0] ?? "");
   return {
     name: item.name,
     itemType: item.type,
@@ -117,8 +120,9 @@ export function describe(item) {
     typeValue: system.type?.value ?? "",
     subtype: system.type?.subtype ?? "",
     baseItem: system.type?.baseItem ?? "",
-    rarity: system.rarity ?? "",
-    magic: hasProp("mgc")
+    rarity,
+    // An item is magic if it has the Magical property or any rarity. Many magic items have only one of the two.
+    magic: hasProp("mgc") || !!rarity
   };
 }
 
@@ -239,19 +243,19 @@ export function magicTools(d) {
  * @param {Item|object} item     Full item or compendium index entry.
  * @param {object} [options]
  * @param {boolean} [options.allowUnlisted]  Let any Artisan's Tools craft nonmagical items the rules don't list.
- * @returns {{ tools: string[], magic: boolean, needsArcana: boolean }}
+ * @returns {{ tools: string[], magic: boolean, rarity: string, needsArcana: boolean }}
  */
 export function craftingTools(item, { allowUnlisted=false }={}) {
   const override = foundry.utils.getProperty(item, `flags.${MODULE_ID}.tools`);
   const d = describe(item);
-  const isMagic = d.magic && !!d.rarity;
+  const isMagic = d.magic;
   const explicitlyListed = CRAFTED_BY.has(d.key);
   if ( Array.isArray(override) && override.length ) {
-    return { tools: [...override], magic: isMagic, needsArcana: isMagic && !explicitlyListed };
+    return { tools: [...override], magic: isMagic, rarity: d.rarity, needsArcana: isMagic && !explicitlyListed };
   }
   let tools = isMagic ? magicTools(d) : mundaneTools(d);
   if ( !tools.length && allowUnlisted ) tools = [...ARTISAN_TOOLS];
-  return { tools, magic: isMagic, needsArcana: isMagic && !explicitlyListed };
+  return { tools, magic: isMagic, rarity: d.rarity, needsArcana: isMagic && !explicitlyListed };
 }
 
 /** Item types that can be crafted. */

@@ -56,6 +56,10 @@ export function canCraft(actor, item) {
   if ( rule.needsArcana && !setting("allowMagicItems") ) {
     return { tools: [], ok: false, magic: rule.magic, reason: game.i18n.localize("DND5ECRAFT.Reason.MagicOff") };
   }
+  // The crafting cost of a magic item comes from its rarity, so one without a rarity can't be priced.
+  if ( rule.needsArcana && !rule.rarity ) {
+    return { tools: [], ok: false, magic: rule.magic, reason: game.i18n.localize("DND5ECRAFT.Reason.NoRarity") };
+  }
   const known = proficientTools(actor);
   const tools = rule.tools.filter(t => known.includes(t));
   if ( !rule.tools.length ) {
@@ -90,7 +94,7 @@ export function resetCatalog() {
 export async function loadCatalog() {
   if ( catalogCache ) return catalogCache;
   const fields = [
-    "system.identifier", "system.type", "system.rarity", "system.properties", "system.price", "system.quantity",
+    "system.identifier", "system.type", "system.rarity", "system.rarities", "system.properties", "system.price", "system.quantity",
     `flags.${MODULE_ID}.tools`, "flags.dnd5e.spellLevel"
   ];
   const byKey = new Map();
@@ -121,7 +125,7 @@ export async function loadCatalog() {
         key: d.key,
         quantity,
         rarity: d.magic ? d.rarity : "",
-        magic: d.magic && !!d.rarity,
+        magic: d.magic,
         estimate: await estimateCost(entry),
         source: entry
       });
@@ -136,10 +140,11 @@ export async function loadCatalog() {
  * from the index and asks the system for its crafting cost, leaving out the base item (which isn't loaded yet).
  */
 async function estimateCost(entry) {
-  if ( isMundane(entry.system) ) return mundaneCost(entry.system.price);
+  if ( isMundane(entry) ) return mundaneCost(entry.system.price);
   try {
     const temp = new Item.implementation({
-      name: entry.name, type: entry.type, system: entry.system, flags: entry.flags ?? {}
+      name: entry.name, type: entry.type, flags: entry.flags ?? {},
+      system: { ...entry.system, properties: magicProperties(entry.system) }
     });
     const { days, gold } = await temp.system.getCraftCost({ baseItem: "none" });
     return { cp: gpToCp(gold), days: Math.max(1, days) };
@@ -148,11 +153,19 @@ async function estimateCost(entry) {
   }
 }
 
-/** Whether the system prices this item as nonmagical (cost and time follow its price). */
-function isMundane(system) {
-  const properties = system.properties;
-  const magic = (properties instanceof Set) ? properties.has("mgc") : Array.from(properties ?? []).includes("mgc");
-  return !magic || !system.rarity;
+/** Whether an item (full item or index entry) is nonmagical, so its cost and time follow its price. */
+function isMundane(item) {
+  return !describe(item).magic;
+}
+
+/**
+ * Item data with the Magical property added. The system's `getCraftCost` prices an item without it as nonmagical,
+ * even when it has a rarity.
+ * @param {object} system  Item system data or source.
+ * @returns {string[]}
+ */
+function magicProperties(system) {
+  return [...new Set([...Array.from(system.properties ?? []), "mgc"])];
 }
 
 /**
@@ -184,11 +197,14 @@ function mundaneCost(price, batches=1) {
  */
 export async function craftCost(item, batches=1) {
   // Nonmagical batches are priced together, so workdays follow the total price.
-  if ( isMundane(item.system) ) return mundaneCost(item.system.price, batches);
+  if ( isMundane(item) ) return mundaneCost(item.system.price, batches);
 
   // Magic items come from the system rules (rarity, base item, consumables, scrolls, exceptions), one at a time.
   if ( !item.system.getCraftCost ) return { cp: 0, days: 1 };
-  const { days, gold } = await item.system.getCraftCost();
+  const priced = item.system.properties?.has?.("mgc")
+    ? item
+    : item.clone({ "system.properties": magicProperties(item.system) });
+  const { days, gold } = await priced.system.getCraftCost();
   return { cp: gpToCp(gold) * batches, days: Math.max(1, days * batches) };
 }
 
