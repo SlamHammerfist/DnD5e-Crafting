@@ -6,12 +6,13 @@ import {
 } from "./crafting.mjs";
 import { formatCost, walletValue } from "./currency.mjs";
 
-const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
+const { DialogV2 } = foundry.applications.api;
 
 /**
  * Crafting window for one actor: running projects, starting a new one, and Fast Crafting.
+ * Built on the dnd5e system's application class so it gets the system's window frame and styles.
  */
-export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class CraftingApp extends dnd5e.applications.api.Application5e {
   constructor(actor, options={}) {
     super({ ...options, id: `${MODULE_ID}-${actor.uuid.replaceAll(".", "-")}` });
     this.actor = actor;
@@ -36,7 +37,7 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
       icon: "fa-solid fa-hammer",
       resizable: true
     },
-    position: { width: 580, height: 660 },
+    position: { width: 600, height: 700 },
     actions: {
       switchTab: CraftingApp.#onTab,
       start: CraftingApp.#onStart,
@@ -66,8 +67,13 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
   /** Show items the actor can't craft, with the reason. */
   showAll = false;
 
+  /** The dnd5e window header shows the title large and the subtitle beneath it. */
+  get subtitle() {
+    return this.actor.name;
+  }
+
   get title() {
-    return game.i18n.format("DND5ECRAFT.Title", { name: this.actor.name });
+    return game.i18n.localize("DND5ECRAFT.WindowTitle");
   }
 
   /* -------------------------------------------- */
@@ -109,17 +115,33 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
         rarity,
         ok: check.ok,
         reason: check.reason,
-        tools: check.tools.map(toolLabel).join(", "),
-        estimate: game.i18n.format("DND5ECRAFT.Estimate", {
-          cost: formatCost(entry.estimate.cp), days: entry.estimate.days
-        }),
+        tools: check.tools.map(toolLabel),
+        cost: formatCost(entry.estimate.cp),
+        days: entry.estimate.days,
         search: `${entry.name} ${rarity}`.toLowerCase()
       });
     }
 
+    // Coins the actor holds, largest first, with the system's coin icons.
+    const coins = Object.entries(CONFIG.DND5E.currencies)
+      .sort(([, a], [, b]) => (a.conversion ?? 0) - (b.conversion ?? 0))
+      .map(([key, config]) => ({
+        key,
+        icon: config.icon,
+        label: config.label,
+        count: Number(actor.system.currency?.[key]) || 0
+      }))
+      .filter(c => c.count > 0)
+      .map(c => ({ ...c, count: c.count.toLocaleString(game.i18n.lang) }));
+
     const fastEnabled = hasFastCrafting(actor);
     const fastUsed = fastCraftingUsed(actor);
     return {
+      ...(await super._prepareContext(options)),
+      coins,
+      toolNames: tools.map(toolLabel),
+      activeProjects: projects.filter(p => !p.finished),
+      finishedProjects: projects.filter(p => p.finished),
       tab: this.tab,
       tabs: [
         { id: "projects", label: "DND5ECRAFT.Tab.Projects", icon: "fa-solid fa-list-check", count: projects.filter(p => !p.finished).length },
@@ -169,18 +191,6 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
       });
       this.#filter();
     }
-    const drop = this.element.querySelector(".craft-drop");
-    if ( drop ) {
-      drop.addEventListener("dragover", event => {
-        event.preventDefault();
-        drop.classList.add("hover");
-      });
-      drop.addEventListener("dragleave", () => drop.classList.remove("hover"));
-      drop.addEventListener("drop", event => {
-        drop.classList.remove("hover");
-        this.#onDrop(event);
-      });
-    }
   }
 
   /** Show the dnd5e item card when hovering an item, like on the character sheet. */
@@ -209,16 +219,6 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
     }
     const empty = this.element.querySelector(".craft-catalog-empty");
     if ( empty ) empty.hidden = shown > 0;
-  }
-
-  /** Start a project from an item dropped onto the window. */
-  async #onDrop(event) {
-    event.preventDefault();
-    const TextEditor = foundry.applications.ux.TextEditor.implementation;
-    const data = TextEditor.getDragEventData(event);
-    if ( data?.type !== "Item" ) return;
-    const item = await Item.implementation.fromDropData(data);
-    if ( item ) await this.#confirmStart(item);
   }
 
   /* -------------------------------------------- */
@@ -253,6 +253,7 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
       ? game.i18n.format("DND5ECRAFT.LogWork.HintHelped", { helpers: listNames(helpers.map(h => h.name)), crew, remaining, days: daysLeft })
       : game.i18n.format("DND5ECRAFT.LogWork.Hint", { remaining });
     const days = await DialogV2.prompt({
+      classes: ["dnd5e2"],
       window: { title: game.i18n.format("DND5ECRAFT.LogWork.Title", { item: itemLabel(project) }), icon: "fa-solid fa-hammer" },
       content: `<div class="form-group">
           <label>${game.i18n.localize("DND5ECRAFT.LogWork.Days")}</label>
@@ -286,6 +287,7 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
         <img src="${a.img}" alt=""> ${foundry.utils.escapeHTML(a.name)}
       </label>`).join("");
     const ids = await DialogV2.prompt({
+      classes: ["dnd5e2"],
       window: { title: game.i18n.format("DND5ECRAFT.Helpers.Title", { item: itemLabel(project) }), icon: "fa-solid fa-people-carry-box" },
       position: { width: 360 },
       content: `<div class="${MODULE_ID}-helpers">
@@ -319,6 +321,7 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
     if ( !project ) return;
     if ( project.finished ) return abandonProject(this.actor, id);
     const ok = await DialogV2.confirm({
+      classes: ["dnd5e2"],
       window: { title: "DND5ECRAFT.Abandon.Title", icon: "fa-solid fa-trash" },
       content: `<p>${game.i18n.format("DND5ECRAFT.Abandon.Content", { item: itemLabel(project), cost: formatCost(project.cost) })}</p>`,
       rejectClose: false
@@ -339,6 +342,7 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const { tool, key } = target.dataset;
     const name = target.closest("[data-name]")?.dataset.name ?? key;
     const ok = await DialogV2.confirm({
+      classes: ["dnd5e2"],
       window: { title: "DND5ECRAFT.Fast.Title", icon: "fa-solid fa-bolt" },
       content: `<p>${game.i18n.format("DND5ECRAFT.Fast.Confirm", { item: name, tool: toolLabel(tool) })}</p>`,
       rejectClose: false
@@ -368,6 +372,7 @@ export class CraftingApp extends HandlebarsApplicationMixin(ApplicationV2) {
     });
 
     const result = await DialogV2.prompt({
+      classes: ["dnd5e2"],
       window: { title: game.i18n.format("DND5ECRAFT.Start.Title", { item: item.name }), icon: "fa-solid fa-hammer" },
       position: { width: 420 },
       content: `

@@ -1,7 +1,9 @@
 {
   "DND5ECRAFT": {
     "Button": "Crafting",
-    "Title": "Crafting: {name}",
+    "WindowTitle": "Crafting",
+    "InProgress": "In Progress",
+    "Catalog": "Items",
     "Wealth": "Coins",
     "Tools": "Tool proficiencies",
     "NoTools": "You aren't proficient with any tools that can craft items.",
@@ -15,11 +17,9 @@
     "Clear": "Clear from list",
     "ClearFinished": "Clear Finished Projects",
     "NoProjects": "No projects yet. Start one on the New Project tab.",
-    "Drop": "Drop an item here from a compendium or the Items sidebar to craft it.",
     "Search": "Search items",
     "ShowAll": "Show items I can't craft",
     "NoMatches": "No craftable items match.",
-    "Estimate": "{cost} · {days} days",
     "CantAfford": "{name} can't afford the materials ({cost}). They have {wealth}.",
     "Tab": {
       "Projects": "Projects",

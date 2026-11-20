@@ -31,7 +31,10 @@ Hooks.once("init", () => {
     }
   });
 
-  foundry.applications.handlebars.loadTemplates([`modules/${MODULE_ID}/templates/crafting.hbs`]);
+  foundry.applications.handlebars.loadTemplates({
+    [`${MODULE_ID}.crafting`]: `modules/${MODULE_ID}/templates/crafting.hbs`,
+    [`${MODULE_ID}.project`]: `modules/${MODULE_ID}/templates/project.hbs`
+  });
 });
 
 Hooks.once("ready", () => {

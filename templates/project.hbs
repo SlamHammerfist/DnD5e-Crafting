@@ -1,0 +1,56 @@
+<div class="craft-row project {{#if finished}}finished{{/if}}" data-project-id="{{ id }}">
+    <img class="gold-icon" src="{{ img }}" alt="" {{#if uuid}}data-item-uuid="{{ uuid }}"{{/if}}>
+    <div class="craft-info">
+        <div class="craft-name" {{#if uuid}}data-item-uuid="{{ uuid }}"{{/if}}>{{ label }}</div>
+        <ul class="pills">
+            <li class="pill">{{ toolLabel }}</li>
+            <li class="pill transparent"><i class="fa-solid fa-coins" inert></i> {{ localize "DND5ECRAFT.MaterialsPaid" cost=costLabel }}</li>
+            {{#if helperNames}}
+            <li class="pill transparent">
+                <i class="fa-solid fa-people-carry-box" inert></i> {{ localize "DND5ECRAFT.Helpers.Line" names=helperNames }} · {{ daysLeft }}
+            </li>
+            {{/if}}
+        </ul>
+        <div class="meter progress {{#if complete}}complete{{/if}}" role="meter" aria-valuemin="0"
+             aria-valuemax="{{ days }}" aria-valuenow="{{ progress }}" style="--bar-percentage: {{ pct }}%">
+            <div class="label">
+                <i class="fa-solid fa-calendar-day" inert></i>
+                <span class="value">{{ progress }}</span>
+                <span class="separator">/</span>
+                <span class="max">{{ days }}</span>
+                <span class="units">{{ localize "DND5ECRAFT.Workdays" }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="craft-controls">
+        {{#if needsFinish}}
+        <button type="button" class="gold-button" data-action="finish" data-tooltip="DND5ECRAFT.FinishHint"
+                aria-label="{{ localize "DND5ECRAFT.Finish" }}">
+            <i class="fa-solid fa-check" inert></i>
+        </button>
+        {{/if}}
+        {{#unless complete}}
+        <button type="button" class="gold-button" data-action="logWork" data-tooltip="DND5ECRAFT.LogWork.Button"
+                aria-label="{{ localize "DND5ECRAFT.LogWork.Button" }}">
+            <i class="fa-solid fa-hammer" inert></i>
+        </button>
+        {{/unless}}
+        {{#if canHelp}}
+        <button type="button" class="unbutton control-button" data-action="helpers" data-tooltip="DND5ECRAFT.Helpers.Button"
+                aria-label="{{ localize "DND5ECRAFT.Helpers.Button" }}">
+            <i class="fa-solid fa-people-carry-box" inert></i>
+        </button>
+        {{/if}}
+        {{#if finished}}
+        <button type="button" class="unbutton control-button" data-action="abandon" data-tooltip="DND5ECRAFT.Clear"
+                aria-label="{{ localize "DND5ECRAFT.Clear" }}">
+            <i class="fa-solid fa-xmark" inert></i>
+        </button>
+        {{else}}
+        <button type="button" class="unbutton control-button" data-action="abandon" data-tooltip="DND5ECRAFT.Abandon.Title"
+                aria-label="{{ localize "DND5ECRAFT.Abandon.Title" }}">
+            <i class="fa-solid fa-trash" inert></i>
+        </button>
+        {{/if}}
+    </div>
+</div>

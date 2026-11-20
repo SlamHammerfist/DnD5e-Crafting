@@ -6,7 +6,7 @@ Click the **hammer** button next to the coins on a character's inventory tab to 
 
 ## Crafting projects
 
-1. On the **New Project** tab, pick an item from the list or drop one onto the window from a compendium or the Items sidebar.
+1. On the **New Project** tab, pick an item from the list. Only items from the crafting compendiums can be crafted.
    The list shows only items your tool proficiencies can make. Tick **Show items I can't craft** to see the rest and why.
 2. Choose the tool and how many to make. The dialog shows the material cost, the workdays and your coins.
 3. **Buy Materials and Start** pays for the materials and adds the project to the **Projects** tab.

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 (2026-11-19)
+### Changed
+- The crafting window now uses the dnd5e system's window style, like the system's own dialogs: the large title with the character's name beneath it, gold-bordered cards, tool and coin pills, coin icons, the system's progress meters and gold buttons.
+- The start, work, helpers and abandon dialogs use the dnd5e style too.
+- Projects are split into In Progress and Finished cards.
+
+## 1.0.5 (2026-11-19)
+### Removed
+- Items can no longer be dropped onto the crafting window. Projects start only from the item list, which shows what the character is allowed to craft.
+
 ## 1.0.4 (2026-11-19)
 ### Fixed
 - Magic items could be crafted with **Allow Magic Items** turned off. dnd5e 6 stores rarity in `system.rarities`, so items such as Hammer of Thunderbolts and Dragon Scale Mail looked nonmagical and were priced at half their listed price. An item now counts as magic if it has the Magical property or any rarity.

@@ -1,166 +1,206 @@
-.dnd5e-crafting .window-content {
-  padding: 0;
+/* ---------------------------------- */
+/*  Crafting window                   */
+/*  Built on the dnd5e2 application   */
+/*  styles: cards, pills, meters and  */
+/*  gold buttons come from the system */
+/* ---------------------------------- */
+
+.dnd5e2.dnd5e-crafting .window-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .dnd5e-crafting .craft-body {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  gap: 0.5rem;
-  padding: 0.75rem;
-}
-
-.dnd5e-crafting .craft-header {
-  display: flex;
-  gap: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--color-border, #7a7971);
-}
-
-.dnd5e-crafting .craft-stat {
-  display: flex;
-  flex-direction: column;
-}
-
-.dnd5e-crafting .craft-stat.tools {
+  gap: 8px;
   flex: 1;
-}
-
-.dnd5e-crafting .craft-stat .label {
-  font-size: var(--font-size-11, 11px);
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-.dnd5e-crafting .craft-tabs {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.dnd5e-crafting .craft-tab {
-  flex: 1;
-  opacity: 0.7;
-}
-
-.dnd5e-crafting .craft-tab.active {
-  opacity: 1;
-  font-weight: bold;
-  box-shadow: inset 0 -2px 0 var(--color-warm-2, #c9593f);
-}
-
-.dnd5e-crafting .craft-tab .count {
-  display: inline-block;
-  min-width: 1.25em;
-  padding: 0 0.3em;
-  border-radius: 0.6em;
-  font-size: var(--font-size-11, 11px);
-  background: var(--color-warm-2, #c9593f);
-  color: #fff;
-}
-
-.dnd5e-crafting .craft-scroll {
-  flex: 1;
-  overflow-y: auto;
   min-height: 0;
 }
 
-.dnd5e-crafting .craft-empty,
-.dnd5e-crafting .hint {
-  opacity: 0.75;
-  font-style: italic;
+.dnd5e-crafting .craft-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 4px 4px;
+}
+
+/* Coins and tools */
+.dnd5e-crafting .craft-summary {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--dnd5e-color-gold);
+}
+
+.dnd5e-crafting .craft-summary-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dnd5e-crafting .craft-summary-group.tools {
+  flex: 1;
+}
+
+.dnd5e-crafting .craft-summary-label {
+  font-family: var(--dnd5e-font-roboto-slab);
+  font-size: var(--font-size-11);
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.dnd5e-crafting .pill.coin {
+  align-items: center;
+  font-weight: bold;
+}
+
+.dnd5e-crafting .pill .currency {
+  inline-size: 1.1em;
+  block-size: 1.1em;
+}
+
+/* Tabs */
+.dnd5e-crafting .craft-tabs {
+  display: flex;
+  margin: 0;
+}
+
+.dnd5e-crafting .craft-tabs .item {
   text-align: center;
-  margin: 1rem 0.5rem;
+  cursor: pointer;
 }
 
-.dnd5e-crafting img {
-  width: 36px;
-  height: 36px;
-  flex: none;
+.dnd5e-crafting .craft-tabs .count {
+  display: inline-block;
+  min-inline-size: 1.4em;
+  padding: 1px 4px;
+  border-radius: 3px;
   border: none;
-  border-radius: 4px;
-  object-fit: cover;
+  background: var(--dnd5e-color-gold);
+  color: var(--dnd5e-color-black);
+  font-size: var(--font-size-11);
 }
 
-/* Projects */
-.dnd5e-crafting .craft-project {
+/* Rows inside cards */
+.dnd5e-crafting fieldset.card {
+  gap: 0;
+  padding: 6px 8px;
+}
+
+.dnd5e-crafting .craft-row {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.25rem;
-  border-bottom: 1px solid var(--color-border-light-2, rgba(0, 0, 0, 0.15));
+  gap: 10px;
+  padding: 6px 0;
 }
 
-.dnd5e-crafting .craft-project .info {
+.dnd5e-crafting .craft-row + .craft-row {
+  border-top: 1px solid var(--color-border-light-2, rgba(0, 0, 0, 0.15));
+}
+
+.dnd5e-crafting .craft-row[hidden] {
+  display: none;
+}
+
+.dnd5e-crafting .craft-row.disabled {
+  opacity: 0.6;
+}
+
+.dnd5e-crafting .craft-row .gold-icon {
+  --gold-icon-size: 36px;
+}
+
+.dnd5e-crafting .craft-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   flex: 1;
   min-width: 0;
 }
 
-.dnd5e-crafting .craft-project h3 {
-  margin: 0;
-  font-size: var(--font-size-14, 14px);
-  border: none;
+.dnd5e-crafting .craft-name {
+  font-family: var(--dnd5e-font-roboto-slab);
+  font-size: var(--font-size-14);
+  font-weight: bold;
 }
 
-.dnd5e-crafting .meta {
-  font-size: var(--font-size-12, 12px);
-  opacity: 0.75;
-  margin: 0.1rem 0 0.25rem;
+.dnd5e-crafting .craft-name .rarity {
+  font-family: var(--dnd5e-font-roboto);
+  font-size: var(--font-size-11);
+  font-weight: normal;
+  font-style: italic;
+  color: var(--color-text-secondary);
 }
 
-.dnd5e-crafting .progress {
-  position: relative;
-  height: 18px;
-  border-radius: 9px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.2);
+.dnd5e-crafting .craft-reason {
+  font-size: var(--font-size-12);
+  font-style: italic;
+  color: var(--color-text-secondary);
 }
 
-.dnd5e-crafting .progress .bar {
-  height: 100%;
-  background: linear-gradient(90deg, #b5662d, #e09a3e);
-}
-
-.dnd5e-crafting .progress .text {
-  position: absolute;
-  inset: 0;
+.dnd5e-crafting .craft-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-11, 11px);
-  color: #fff;
-  text-shadow: 0 0 2px #000;
-}
-
-.dnd5e-crafting .buttons {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.dnd5e-crafting .buttons button,
-.dnd5e-crafting .craft-entry button {
+  gap: 6px;
   flex: none;
-  width: auto;
-  white-space: nowrap;
 }
 
-/* New project */
-.dnd5e-crafting .craft-drop {
-  padding: 0.6rem;
-  border: 2px dashed var(--color-border, #7a7971);
-  border-radius: 6px;
-  text-align: center;
+.dnd5e-crafting .craft-controls .control-button {
+  color: var(--color-text-secondary);
+}
+
+.dnd5e-crafting .craft-controls .control-button:hover {
+  color: var(--color-text-primary);
+}
+
+/* Progress */
+.dnd5e-crafting .meter.progress {
+  block-size: 22px;
+}
+
+.dnd5e-crafting .meter .label {
+  font-size: var(--font-size-12);
+}
+
+.dnd5e-crafting .meter .label .units {
+  font-weight: normal;
+  opacity: 0.85;
+}
+
+.dnd5e-crafting .meter.progress.complete::before {
+  --bar-color-2: var(--dnd5e-color-green, #3f7d3a);
+}
+
+.dnd5e-crafting fieldset.finished .craft-row {
   opacity: 0.8;
 }
 
-.dnd5e-crafting .craft-drop.hover {
-  opacity: 1;
-  border-color: var(--color-warm-2, #c9593f);
+.dnd5e-crafting .craft-clear {
+  align-self: center;
+  margin: 8px 0 2px;
+  width: auto;
 }
 
+.dnd5e-crafting fieldset > .empty,
+.dnd5e-crafting .craft-note,
+.dnd5e-crafting .craft-fast > .hint {
+  margin: 6px 0;
+  font-style: italic;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+/* New project */
 .dnd5e-crafting .craft-filter {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 12px;
 }
 
 .dnd5e-crafting .craft-filter input[type="search"] {
@@ -170,54 +210,17 @@
 .dnd5e-crafting .craft-filter .checkbox {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 4px;
   white-space: nowrap;
-}
-
-.dnd5e-crafting .craft-entry {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.3rem 0.25rem;
-  border-bottom: 1px solid var(--color-border-light-2, rgba(0, 0, 0, 0.15));
-}
-
-.dnd5e-crafting .craft-entry[hidden] {
-  display: none;
-}
-
-.dnd5e-crafting .craft-entry.disabled {
-  opacity: 0.55;
-}
-
-.dnd5e-crafting .craft-entry .info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.dnd5e-crafting .craft-entry .meta {
-  margin: 0;
-}
-
-.dnd5e-crafting .rarity {
-  font-size: var(--font-size-11, 11px);
-  opacity: 0.75;
-  font-style: italic;
+  font-size: var(--font-size-12);
 }
 
 /* Fast crafting */
-.dnd5e-crafting .fast-tool h3,
-.dnd5e-crafting .fast-held h3 {
-  margin: 0.75rem 0 0.35rem;
-  font-size: var(--font-size-14, 14px);
-}
-
 .dnd5e-crafting .fast-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 6px;
+  padding: 4px 0;
 }
 
 .dnd5e-crafting .fast-item {
@@ -225,30 +228,12 @@
   width: auto;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 6px;
+  padding-inline: 4px 8px;
 }
 
-.dnd5e-crafting .fast-item img {
-  width: 24px;
-  height: 24px;
-}
-
-.dnd5e-crafting .fast-held ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.dnd5e-crafting .fast-held li {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.2rem 0;
-}
-
-.dnd5e-crafting .fast-held li img {
-  width: 24px;
-  height: 24px;
+.dnd5e-crafting .fast-item .gold-icon {
+  --gold-icon-size: 24px;
 }
 
 /* Start dialog */
@@ -271,11 +256,7 @@
   opacity: 0.8;
 }
 
-/* Helpers */
-.dnd5e-crafting .meta.helpers {
-  opacity: 0.9;
-}
-
+/* Helpers dialog */
 .dnd5e-crafting-helpers .helper-row {
   display: flex;
   align-items: center;
@@ -289,30 +270,4 @@
   border: none;
   border-radius: 4px;
   object-fit: cover;
-}
-
-/* Finished projects */
-.dnd5e-crafting .craft-project.finished {
-  opacity: 0.75;
-}
-
-.dnd5e-crafting .craft-project.finished .progress .bar {
-  background: linear-gradient(90deg, #3f7d3a, #6aa84f);
-}
-
-.dnd5e-crafting .craft-project .badge {
-  margin-left: 0.35rem;
-  padding: 0 0.4em;
-  border-radius: 0.6em;
-  font-size: var(--font-size-11, 11px);
-  font-weight: normal;
-  background: #3f7d3a;
-  color: #fff;
-  vertical-align: middle;
-}
-
-.dnd5e-crafting .craft-clear {
-  margin: 0.75rem auto 0.25rem;
-  display: block;
-  width: auto;
 }
